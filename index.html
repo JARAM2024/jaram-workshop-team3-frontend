@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TEAM-3</title>
+    <style>
+        div {
+            text-align: center;
+            align-items: center;
+        }
+    </style>
+</head>
+<body>
+    <div>
+        <button onclick="openDoor()">
+            <img src="images/closed-door.png" alt="closed-door">
+        </button>
+        <p class="door-status">door-status: </p>
+        <p class="umbrella-status">umbrella-status: </p>
+        <p class="temperature">temperature: </p>
+        <p class="humidity">humidity: </p>
+        <p class="ranning">ranning: </p>
+    </div>
+</body>
+<script type="text/javascript">
+    const doorStatus = document.querySelector('.door-status').firstChild;
+    const umbrellaStatus = document.querySelector('.umbrella-status').firstChild;
+    const temperature = document.querySelector('.temperature').firstChild;
+    const humidity = document.querySelector('.humidity').firstChild;
+    const ranning = document.querySelector('.ranning').firstChild;
+
+    setInterval(async () => {
+        const response = await fetch('http://localhost:8000/status')
+        const data = await response.json()
+        doorStatus.nodeValue = `door status: ${data.door_open}`;
+        umbrellaStatus.nodeValue = `umbrella status: ${data.umbrella_present}`;
+        temperature.nodeValue = `temperature: ${data.temperature}`;
+        humidity.nodeValue = `humidity: ${data.humidity}`;
+        ranning.nodeValue = `ranning: ${data.is_raining}`;
+    }, 1000);
+
+    function openDoor() {
+        fetch('http://localhost:8000/door', {
+            method: 'POST',
+        });
+    }
+
+    const event = new EventSource("http:localhost:8000/umbrella")
+    const audio = new Audio("audio/siren.mp3")
+    event.onmessage = async (e) => {
+        audio.play()
+        setTimeout(() => {
+            audio.pause()
+        }, 5000)
+    }
+
+    </script>
+</html>
